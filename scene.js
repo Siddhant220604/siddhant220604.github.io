@@ -30,9 +30,9 @@ try {
 if (!renderer) {
   if (button) button.remove();
 } else {
-  const VIOLET = new THREE.Color('#8B5CF6');
-  const INDIGO = new THREE.Color('#4F46E5');
-  const PALE   = new THREE.Color('#D8CCFF');
+  const SAND   = new THREE.Color('#D2A98C');
+  const MAUVE  = new THREE.Color('#8E82A0');
+  const HAZE   = new THREE.Color('#EFE7DC');
   const mobile = innerWidth < 760;
 
   const scene  = new THREE.Scene();
@@ -59,7 +59,7 @@ if (!renderer) {
   dGeo.setAttribute('aSeed', new THREE.BufferAttribute(dSeed, 1));
   const dMat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uTime: { value: 0 }, uSize: { value: mobile ? 30 : 42 }, uCol: { value: PALE } },
+    uniforms: { uTime: { value: 0 }, uSize: { value: mobile ? 30 : 42 }, uCol: { value: HAZE } },
     vertexShader: `
       attribute float aSeed;
       uniform float uTime; uniform float uSize;
@@ -124,7 +124,7 @@ if (!renderer) {
     uniforms: {
       uTime: { value: 0 }, uSize: { value: mobile ? 24 : 32 },
       uMorph: { value: 0 }, uOpacity: { value: 0.7 },
-      uA: { value: INDIGO }, uB: { value: VIOLET }, uC: { value: PALE }
+      uA: { value: MAUVE }, uB: { value: SAND }, uC: { value: HAZE }
     },
     vertexShader: `
       attribute vec3 aB; attribute vec3 aC; attribute float aSeed;
@@ -149,7 +149,7 @@ if (!renderer) {
       void main(){
         float d = length(gl_PointCoord - 0.5);
         if (d > 0.5) discard;
-        // indigo core -> violet body -> pale rim, rather than a flat two-stop ramp
+        // mauve shade -> sunlit sand -> hazy sky, the video read as a gradient
         vec3 col = vMix < 0.5 ? mix(uA, uB, vMix * 2.0) : mix(uB, uC, (vMix - 0.5) * 2.0);
         gl_FragColor = vec4(col, smoothstep(0.5, 0.0, d) * uOpacity);
       }`
