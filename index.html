@@ -596,7 +596,7 @@
     <div class="nx-main">
       <div>
         <h1 class="nx-h1">Ship AI that runs on hardware you already own</h1>
-        <form class="nx-form" action="mailto:siddjwal220594@gmail.com" method="get">
+        <form class="nx-form" id="nx-form">
           <input class="nx-mail" type="email" name="from" placeholder="Type your email" aria-label="Your email" />
           <button class="nx-cta" type="submit">Get in touch</button>
         </form>
@@ -1178,6 +1178,18 @@
   inHero();
   addEventListener('scroll', inHero, { passive:true });
   addEventListener('resize', inHero, { passive:true });
+
+  /* Browsers block (and warn about) forms posting to mailto:, so compose the
+     message ourselves and hand it to the mail client. */
+  var form = document.getElementById('nx-form');
+  if(form) form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var from = (form.querySelector('.nx-mail').value || '').trim();
+    var body = from ? 'You can reach me at ' + from + '.' : '';
+    location.href = 'mailto:siddjwal220594@gmail.com?subject='
+      + encodeURIComponent('Hello Siddhant')
+      + (body ? '&body=' + encodeURIComponent(body) : '');
+  });
 
   /* A 14 MB third-party video may stall or 404; the page must not look broken. */
   const vid = nx.querySelector('.nx-video');
