@@ -85,7 +85,22 @@
   }
 
   /* --- top bar --- */
-  .nx-nav{display:flex; align-items:center; justify-content:space-between; padding:20px;}
+  .nx-nav{
+    position:fixed; top:0; left:0; right:0; z-index:70;
+    display:flex; align-items:center; justify-content:space-between; padding:20px;
+    transition:background-color .3s ease, backdrop-filter .3s ease, border-color .3s ease;
+    border-bottom:1px solid transparent;
+  }
+  /* Once the video is behind us the bar needs its own ground, and the
+     brand can no longer rely on the light footage for contrast. */
+  .nx-nav.scrolled{
+    background:rgba(20,18,26,.82); border-bottom-color:rgba(242,239,234,.07);
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    padding-top:14px; padding-bottom:14px;
+  }
+  .nx-nav.scrolled .nx-brand{color:#fff;}
+  .nx-nav.scrolled .nx-brand svg{fill:#fff;}
+  .nx-nav.scrolled .nx-burger{color:#fff;}
   @media (min-width:640px){ .nx-nav{padding:24px 32px;} }
   @media (min-width:1024px){ .nx-nav{padding:24px 48px;} }
 
@@ -103,6 +118,8 @@
     transition:background-color .2s ease, color .2s ease;
   }
   .nx-pill a:hover{background:rgba(255,255,255,.10); color:#fff;}
+  .nx-pill a.active{background:rgba(255,255,255,.16); color:#fff;}
+  .nx-drawer nav a.active{background:rgba(255,255,255,.12); color:#fff;}
   .nx-cta{
     display:inline-flex; align-items:center; justify-content:center;
     border:0; cursor:pointer; border-radius:9999px; padding:0 20px;
@@ -295,36 +312,7 @@
   }
 
   /* ---------- header ---------- */
-  /* Echoes the hero glass pill so the two navigations read as one system. */
-  header{
-    position:sticky; top:0; z-index:60;
-    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
-    background:linear-gradient(to bottom, rgba(20,18,26,.88), rgba(20,18,26,.60));
-    border-bottom:1px solid rgba(242,239,234,.06);
-  }
-  #progress{height:2px; background:linear-gradient(90deg,var(--violet),var(--violet-soft)); width:0; transition:width .1s linear;}
-  .nav{display:flex; align-items:center; justify-content:space-between; height:66px;}
-  .mark{display:flex; align-items:center; gap:10px; text-decoration:none;}
-  .mark svg{filter:drop-shadow(0 0 10px rgba(210,169,140,.75));}
-  .mark span{font-family:var(--body); font-weight:500; letter-spacing:.02em; font-size:.9rem;}
-  .nav-links{
-    display:flex; gap:4px; align-items:center;
-    font-family:var(--body); font-weight:500; font-size:.82rem;
-    border-radius:9999px; background:rgba(255,255,255,.07); padding:5px;
-    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-  }
-  .nav-links a{
-    position:relative; text-decoration:none; border-radius:9999px;
-    padding:6px 14px; color:rgba(242,239,234,.72);
-    transition:background-color .2s ease, color .2s ease;
-  }
-  .nav-links a:hover{background:rgba(255,255,255,.10); color:var(--text);}
-  .nav-links a.active{background:rgba(255,255,255,.12); color:var(--text);}
-  .burger{display:none; background:none; border:0; padding:8px; cursor:pointer;}
-  .burger span{display:block; width:22px; height:2px; background:var(--text); margin:4px 0; transition:.25s;}
-  .burger[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg);}
-  .burger[aria-expanded="true"] span:nth-child(2){opacity:0;}
-  .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+  #progress{position:fixed; top:0; left:0; z-index:71; height:2px; width:0; background:linear-gradient(90deg,var(--violet),var(--violet-soft)); transition:width .1s linear;}
 
   /* ---------- hero ---------- */
   .hero{padding:70px 0 30px;}
@@ -532,15 +520,6 @@
     .stats{grid-template-columns:1fr 1fr;}
     .hello .arrow{display:none;}
     section{padding:68px 0;}
-    .burger{display:block;}
-    .nav-links{
-      position:absolute; top:68px; left:0; right:0; flex-direction:column; gap:0; align-items:stretch;
-      background:rgba(13,5,28,.98); border-bottom:1px solid var(--line);
-      max-height:0; overflow:hidden; transition:max-height .3s ease;
-    }
-    .nav-links.open{max-height:280px;}
-    .nav-links a{padding:15px 24px; border-bottom:1px solid rgba(210,169,140,.1);}
-    .nav-links a::after{display:none;}
     #halo{display:none;}
   }
   @media (max-width:520px){
@@ -560,6 +539,39 @@
 <body>
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="frame" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+<div id="progress"></div>
+<div class="nx-nav">
+<a class="nx-brand" href="#top" aria-label="Siddhant Jaiswal — home">
+  <svg width="24" height="24" viewBox="0 0 256 256" aria-hidden="true"><path d="M 128 128 C 128 198.692 70.692 256 0 256 C 0 185.308 57.308 128 128 128 Z M 128 128 C 198.692 128 256 185.308 256 256 C 185.308 256 128 198.692 128 128 Z M 0 0 C 70.692 0 128 57.308 128 128 C 57.308 128 0 70.692 0 0 Z M 256 0 C 256 70.692 198.692 128 128 128 C 128 57.308 185.308 0 256 0 Z"/></svg>
+  <span>siddhant</span>
+</a>
+
+<div class="nx-desk">
+  <div class="nx-pill">
+    <a href="#work">Work</a>
+    <a href="#stack">Stack</a>
+    <a href="#projects">Lab</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a class="nx-cta" href="mailto:siddjwal220594@gmail.com">Get in touch</a>
+</div>
+
+<button class="nx-burger" id="nx-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nx-drawer">
+  <svg class="ic-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  <svg class="ic-x" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+</button>
+</div>
+
+<div class="nx-scrim" id="nx-scrim"></div>
+<aside class="nx-drawer" id="nx-drawer" aria-label="Menu">
+<nav>
+  <a href="#work">Work</a>
+  <a href="#stack">Stack</a>
+  <a href="#projects">Lab</a>
+  <a href="#contact">Contact</a>
+</nav>
+<div class="nx-drawer-cta"><a class="nx-cta" href="mailto:siddjwal220594@gmail.com">Get in touch</a></div>
+</aside>
 <button id="gfx" type="button" aria-pressed="true"><span class="dot" aria-hidden="true"></span><span id="gfx-label">3D on</span></button>
 <div id="halo" aria-hidden="true"></div>
 
@@ -573,38 +585,6 @@
          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260803_192301_9231ed6b-c55c-4a48-909c-4ebe11cf2e11.mp4"></video>
 
   <div class="nx-inner">
-    <div class="nx-nav">
-      <a class="nx-brand" href="#top" aria-label="Siddhant Jaiswal — home">
-        <svg width="24" height="24" viewBox="0 0 256 256" aria-hidden="true"><path d="M 128 128 C 128 198.692 70.692 256 0 256 C 0 185.308 57.308 128 128 128 Z M 128 128 C 198.692 128 256 185.308 256 256 C 185.308 256 128 198.692 128 128 Z M 0 0 C 70.692 0 128 57.308 128 128 C 57.308 128 0 70.692 0 0 Z M 256 0 C 256 70.692 198.692 128 128 128 C 128 57.308 185.308 0 256 0 Z"/></svg>
-        <span>siddhant</span>
-      </a>
-
-      <div class="nx-desk">
-        <div class="nx-pill">
-          <a href="#work">Work</a>
-          <a href="#stack">Stack</a>
-          <a href="#projects">Lab</a>
-          <a href="#contact">Contact</a>
-        </div>
-        <a class="nx-cta" href="mailto:siddjwal220594@gmail.com">Get in touch</a>
-      </div>
-
-      <button class="nx-burger" id="nx-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nx-drawer">
-        <svg class="ic-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-        <svg class="ic-x" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-    </div>
-
-    <div class="nx-scrim" id="nx-scrim"></div>
-    <aside class="nx-drawer" id="nx-drawer" aria-label="Menu">
-      <nav>
-        <a href="#work">Work</a>
-        <a href="#stack">Stack</a>
-        <a href="#projects">Lab</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <div class="nx-drawer-cta"><a class="nx-cta" href="mailto:siddjwal220594@gmail.com">Get in touch</a></div>
-    </aside>
 
     <div class="nx-main">
       <div>
@@ -637,29 +617,6 @@
     </div>
   </div>
 </section>
-
-<header>
-  <div id="progress"></div>
-  <div class="wrap nav">
-    <a class="mark" href="#top" aria-label="Siddhant Jaiswal — home">
-      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
-        <path d="M20 4H7l9 9-9 9h13" stroke="#E8CDB6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M6 13h12" stroke="#E8CDB6" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-      <span>SJ</span>
-    </a>
-    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="nav-links" id="menu">
-      <a href="#top">Home</a>
-      <a href="#work">Work</a>
-      <a href="#stack">Stack</a>
-      <a href="#projects">Lab</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </div>
-</header>
 
   <div class="wrap hero">
 
@@ -1122,7 +1079,7 @@
   topBtn.addEventListener('click',()=>scrollTo({top:0,behavior:reduced?'auto':'smooth'}));
 
   /* active nav link */
-  const links=[...document.querySelectorAll('.nav-links a')];
+  const links=[...document.querySelectorAll('.nx-pill a, .nx-drawer nav a')];
   const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
   const navObs=new IntersectionObserver(es=>{
     es.forEach(e=>{
@@ -1132,17 +1089,6 @@
     });
   },{rootMargin:'-45% 0px -50% 0px'});
   secs.forEach(s=>navObs.observe(s));
-
-  /* mobile menu */
-  const burger=document.getElementById('burger'), menu=document.getElementById('menu');
-  burger.addEventListener('click',()=>{
-    const open=menu.classList.toggle('open');
-    burger.setAttribute('aria-expanded',open);
-    burger.setAttribute('aria-label',open?'Close menu':'Open menu');
-  });
-  menu.addEventListener('click',e=>{
-    if(e.target.tagName==='A'){ menu.classList.remove('open'); burger.setAttribute('aria-expanded','false'); }
-  });
 
   /* card spotlight + cursor halo (pointer devices only) */
   if(matchMedia('(hover:hover)').matches && !reduced){
@@ -1185,12 +1131,17 @@
   drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
   addEventListener('keydown', e => { if(e.key === 'Escape' && nx.dataset.menu === 'open') setMenu(false); });
 
-  /* The canvas sits behind the hero video, so its toggle would be pointing at
-     something invisible; reveal it once the hero has scrolled away. */
-  const inHero = () => document.body.classList.toggle('in-hero', scrollY < nx.offsetHeight - 80);
-  inHero();
-  addEventListener('scroll', inHero, { passive:true });
-  addEventListener('resize', inHero, { passive:true });
+  /* One bar for the whole site: transparent over the video, glass once the
+     page is underneath it. The canvas toggle hides while the video covers it. */
+  const nav = document.querySelector('.nx-nav');
+  const onScroll = () => {
+    const past = scrollY > nx.offsetHeight - 80;
+    document.body.classList.toggle('in-hero', !past);
+    nav.classList.toggle('scrolled', past);
+  };
+  onScroll();
+  addEventListener('scroll', onScroll, { passive:true });
+  addEventListener('resize', onScroll, { passive:true });
 
   /* Browsers block (and warn about) forms posting to mailto:, so compose the
      message ourselves and hand it to the mail client. */
