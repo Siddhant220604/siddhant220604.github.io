@@ -27,3 +27,6 @@ dist-ssr
 backup/
 .env
 redoxchess-engine/
+# superseded resume - kept locally, not published
+resume_SJ.pdf
+.vite/
