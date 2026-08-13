@@ -1,48 +1,118 @@
 import * as THREE from "three";
 import { GLTF } from "three-stdlib";
+import { eyebrowBoneNames, typingBoneNames } from "../../../data/boneData";
 
-/* The Avaturn export ships one authored clip for its own rig. It is played on
-   a loop as the resting state; everything else the character does (looking at
-   the pointer, moving on scroll) is driven from code on top of it. */
 const setAnimations = (gltf: GLTF) => {
-  const character = gltf.scene;
-  const mixer = new THREE.AnimationMixer(character);
-
-  const idle = gltf.animations?.[0];
-  if (idle) {
-    const action = mixer.clipAction(idle);
-    action.setLoop(THREE.LoopRepeat, Infinity);
-    action.play();
-  } else {
-    console.warn("avatar.glb has no animation clips");
-  }
-
-  // Kept so the scene can fade the character in once loading finishes.
-  function startIntro() {
-    character.traverse((child: any) => {
-      if (child.isMesh && child.material) {
-        const mats = Array.isArray(child.material) ? child.material : [child.material];
-        mats.forEach((m: THREE.Material) => {
-          m.transparent = true;
-          m.opacity = 0;
-        });
+  let character = gltf.scene;
+  let mixer = new THREE.AnimationMixer(character);
+  if (gltf.animations) {
+    const introClip = gltf.animations.find(
+      (clip) => clip.name === "introAnimation"
+    );
+    const introAction = mixer.clipAction(introClip!);
+    introAction.setLoop(THREE.LoopOnce, 1);
+    introAction.clampWhenFinished = true;
+    introAction.play();
+    const clipNames = ["key1", "key2", "key5", "key6"];
+    clipNames.forEach((name) => {
+      const clip = THREE.AnimationClip.findByName(gltf.animations, name);
+      if (clip) {
+        const action = mixer?.clipAction(clip);
+        action!.play();
+        action!.timeScale = 1.2;
+      } else {
+        console.error(`Animation "${name}" not found`);
       }
     });
-    const t0 = performance.now();
-    const fade = () => {
-      const k = Math.min((performance.now() - t0) / 900, 1);
-      character.traverse((child: any) => {
-        if (child.isMesh && child.material) {
-          const mats = Array.isArray(child.material) ? child.material : [child.material];
-          mats.forEach((m: THREE.Material) => { m.opacity = k; });
-        }
-      });
-      if (k < 1) requestAnimationFrame(fade);
+    let typingAction: THREE.AnimationAction | null = null;
+    typingAction = createBoneAction(gltf, mixer, "typing", typingBoneNames);
+    if (typingAction) {
+      typingAction.enabled = true;
+      typingAction.play();
+      typingAction.timeScale = 1.2;
+    }
+  }
+  function startIntro() {
+    const introClip = gltf.animations.find(
+      (clip) => clip.name === "introAnimation"
+    );
+    const introAction = mixer.clipAction(introClip!);
+    introAction.clampWhenFinished = true;
+    introAction.reset().play();
+    setTimeout(() => {
+      const blink = gltf.animations.find((clip) => clip.name === "Blink");
+      mixer.clipAction(blink!).play().fadeIn(0.5);
+    }, 2500);
+  }
+  function hover(gltf: GLTF, hoverDiv: HTMLDivElement) {
+    let eyeBrowUpAction = createBoneAction(
+      gltf,
+      mixer,
+      "browup",
+      eyebrowBoneNames
+    );
+    let isHovering = false;
+    if (eyeBrowUpAction) {
+      eyeBrowUpAction.setLoop(THREE.LoopOnce, 1);
+      eyeBrowUpAction.clampWhenFinished = true;
+      eyeBrowUpAction.enabled = true;
+    }
+    const onHoverFace = () => {
+      if (eyeBrowUpAction && !isHovering) {
+        isHovering = true;
+        eyeBrowUpAction.reset();
+        eyeBrowUpAction.enabled = true;
+        eyeBrowUpAction.setEffectiveWeight(4);
+        eyeBrowUpAction.fadeIn(0.5).play();
+      }
     };
-    requestAnimationFrame(fade);
+    const onLeaveFace = () => {
+      if (eyeBrowUpAction && isHovering) {
+        isHovering = false;
+        eyeBrowUpAction.fadeOut(0.6);
+      }
+    };
+    if (!hoverDiv) return;
+    hoverDiv.addEventListener("mouseenter", onHoverFace);
+    hoverDiv.addEventListener("mouseleave", onLeaveFace);
+    return () => {
+      hoverDiv.removeEventListener("mouseenter", onHoverFace);
+      hoverDiv.removeEventListener("mouseleave", onLeaveFace);
+    };
+  }
+  return { mixer, startIntro, hover };
+};
+
+const createBoneAction = (
+  gltf: GLTF,
+  mixer: THREE.AnimationMixer,
+  clip: string,
+  boneNames: string[]
+): THREE.AnimationAction | null => {
+  const AnimationClip = THREE.AnimationClip.findByName(gltf.animations, clip);
+  if (!AnimationClip) {
+    console.error(`Animation "${clip}" not found in GLTF file.`);
+    return null;
   }
 
-  return { mixer, startIntro };
+  const filteredClip = filterAnimationTracks(AnimationClip, boneNames);
+
+  return mixer.clipAction(filteredClip);
+};
+
+const filterAnimationTracks = (
+  clip: THREE.AnimationClip,
+  boneNames: string[]
+): THREE.AnimationClip => {
+  const filteredTracks = clip.tracks.filter((track) =>
+    boneNames.some((boneName) => track.name.includes(boneName))
+  );
+
+  return new THREE.AnimationClip(
+    clip.name + "_filtered",
+    clip.duration,
+    filteredTracks
+  );
 };
 
 export default setAnimations;

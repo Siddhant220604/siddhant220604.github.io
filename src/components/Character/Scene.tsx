@@ -38,14 +38,10 @@ const Scene = () => {
       renderer.toneMappingExposure = 1;
       canvasDiv.current.appendChild(renderer.domElement);
 
-      // Framed for a standing 1.7m figure, not the desk scene this template
-      // shipped with (which sat at fov 14.5 from 24 units back).
-      const camera = new THREE.PerspectiveCamera(28, aspect, 0.1, 100);
-      // Aim slightly above the camera height: looking down would push the
-      // figure up the frame and crop the head against the nav.
-      camera.position.set(0, -0.5, 3.0);
-      camera.lookAt(0, -0.12, 0);
-      camera.zoom = 1;
+      const camera = new THREE.PerspectiveCamera(14.5, aspect, 0.1, 1000);
+      camera.position.z = 10;
+      camera.position.set(0, 13.1, 24.7);
+      camera.zoom = 1.1;
       camera.updateProjectionMatrix();
 
       let headBone: THREE.Object3D | null = null;
@@ -61,20 +57,13 @@ const Scene = () => {
       loadCharacter().then((gltf) => {
         if (gltf) {
           const animations = setAnimations(gltf);
+          hoverDivRef.current && animations.hover(gltf, hoverDivRef.current);
           mixer = animations.mixer;
           let character = gltf.scene;
           setChar(character);
           scene.add(character);
-          // Mixamo naming from Avaturn; the template's own rig called this spine006.
-          headBone = character.getObjectByName("Head") || null;
-          // Captured before the mixer ever runs, so it is the true bind pose.
-          // The idle clip poses the head turned; aiming from that base sends the
-          // face into profile at one edge of the screen.
-          if (headBone) {
-            headBone.userData.restQuat = headBone.quaternion.clone();
-          }
-          // The avatar has no monitor, so there is no screen glow to drive.
-          screenLight = null;
+          headBone = character.getObjectByName("spine006") || null;
+          screenLight = character.getObjectByName("screenlight") || null;
           progress.loaded().then(() => {
             setTimeout(() => {
               light.turnOnLights();
@@ -120,12 +109,6 @@ const Scene = () => {
       }
       const animate = () => {
         requestAnimationFrame(animate);
-        // The idle clip keyframes the head too, so the mixer has to run first —
-        // pose the head before it and the animation simply overwrites it.
-        const delta = clock.getDelta();
-        if (mixer) {
-          mixer.update(delta);
-        }
         if (headBone) {
           handleHeadRotation(
             headBone,
@@ -135,7 +118,11 @@ const Scene = () => {
             interpolation.y,
             THREE.MathUtils.lerp
           );
-          if (screenLight) light.setPointLight(screenLight);
+          light.setPointLight(screenLight);
+        }
+        const delta = clock.getDelta();
+        if (mixer) {
+          mixer.update(delta);
         }
         renderer.render(scene, camera);
       };
