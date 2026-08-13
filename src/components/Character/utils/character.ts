@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { DRACOLoader, GLTF, GLTFLoader } from "three-stdlib";
 import { setCharTimeline, setAllTimeline } from "../../utils/GsapScroll";
-import { decryptFile } from "./decrypt";
 
 const setCharacter = (
   renderer: THREE.WebGLRenderer,
@@ -14,48 +13,37 @@ const setCharacter = (
   loader.setDRACOLoader(dracoLoader);
 
   const loadCharacter = () => {
-    return new Promise<GLTF | null>(async (resolve, reject) => {
-      try {
-        const encryptedBlob = await decryptFile(
-          "/models/character.enc",
-          "Character3D#@"
-        );
-        const blobUrl = URL.createObjectURL(new Blob([encryptedBlob]));
+    return new Promise<GLTF | null>((resolve, reject) => {
+      loader.load(
+        "/models/avatar.glb",
+        async (gltf) => {
+          const character = gltf.scene;
+          await renderer.compileAsync(character, camera, scene);
 
-        let character: THREE.Object3D;
-        loader.load(
-          blobUrl,
-          async (gltf) => {
-            character = gltf.scene;
-            await renderer.compileAsync(character, camera, scene);
-            character.traverse((child: any) => {
-              if (child.isMesh) {
-                const mesh = child as THREE.Mesh;
-                child.castShadow = false;
-                child.receiveShadow = false;
-                mesh.frustumCulled = true;
-                if (mesh.material && !Array.isArray(mesh.material)) {
-                  (mesh.material as THREE.ShaderMaterial).precision = 'mediump';
-                }
+          character.traverse((child: any) => {
+            if (child.isMesh) {
+              const mesh = child as THREE.Mesh;
+              child.castShadow = false;
+              child.receiveShadow = false;
+              mesh.frustumCulled = true;
+              if (mesh.material && !Array.isArray(mesh.material)) {
+                (mesh.material as THREE.ShaderMaterial).precision = "mediump";
               }
-            });
-            resolve(gltf);
-            setCharTimeline(character, camera);
-            setAllTimeline();
-            character!.getObjectByName("footR")!.position.y = 3.36;
-            character!.getObjectByName("footL")!.position.y = 3.36;
-            dracoLoader.dispose();
-          },
-          undefined,
-          (error) => {
-            console.error("Error loading GLTF model:", error);
-            reject(error);
-          }
-        );
-      } catch (err) {
-        reject(err);
-        console.error(err);
-      }
+            }
+          });
+
+          // The avatar arrives at real-world scale with its feet on the origin;
+          // lift and size it to sit where the landing layout expects a figure.
+          character.scale.setScalar(1);
+          character.position.set(0, -1.55, 0);
+
+          setCharTimeline(character, camera);
+          setAllTimeline();
+          resolve(gltf);
+        },
+        undefined,
+        (error) => reject(error)
+      );
     });
   };
 

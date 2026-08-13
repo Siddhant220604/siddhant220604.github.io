@@ -30,3 +30,4 @@ redoxchess-engine/
 # superseded resume - kept locally, not published
 resume_SJ.pdf
 .vite/
+public/models/avatar-tpose.glb
