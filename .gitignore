@@ -1,18 +1,29 @@
-# OS / editor cruft
-Thumbs.db
-ehthumbs.db
-Desktop.ini
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-*.swp
-.vscode/
-.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.npmrc
 
-# superseded resume - kept locally, not published
-resume_SJ.pdf
-
-preview.html
-preview2.html
-preview3.html
-harness.html
-frame.png
-sampler.html
+backup/
+.env
+redoxchess-engine/
