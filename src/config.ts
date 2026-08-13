@@ -16,10 +16,10 @@ export const config = {
     },
     experiences: [
         {
-            position: "Full-Stack Engineer",
+            position: "Production Web Platform",
             company: "Kiran Traders (client project)",
             period: "2026",
-            location: "Lucknow, India",
+            location: "Lucknow",
             description: "Designed, built and deployed a live wholesale e-commerce platform for a disposable-packaging distributor, covering the full stack from API design to production server administration.",
             responsibilities: [
                 "Built a REST API backend in FastAPI with Pydantic request validation",
@@ -137,9 +137,7 @@ export const config = {
         email: "siddjwal220594@gmail.com",
         github: "https://github.com/Siddhant220604",
         linkedin: "https://linkedin.com/in/siddhant-jaiswal220604",
-        twitter: "",
-        facebook: "",
-        instagram: ""
+        instagram: "https://www.instagram.com/mr_siddhant022/"
     },
     skills: {
         develop: {
@@ -147,12 +145,6 @@ export const config = {
             description: "Generative video and multimodal ML on hardware you already own",
             details: "Orchestration, VRAM budgets, model swapping and error handling — the parts that decide whether a research demo survives contact with real hardware. Pipelines that run end to end on a consumer GPU.",
             tools: ["Python", "TensorFlow", "OpenCV", "Librosa", "ComfyUI", "Ollama", "LTX 2.0", "LoRA", "n8n", "FFmpeg"]
-        },
-        design: {
-            title: "FULL-STACK",
-            description: "APIs and the interfaces on top of them",
-            details: "REST APIs with FastAPI and Pydantic validation, React single-page frontends, MySQL, and the self-managed Debian servers they run on in production.",
-            tools: ["FastAPI", "React", "Pydantic", "REST APIs", "MySQL", "Debian / Linux", "Git", "HTML & CSS", "C / C++", "SQL"]
         }
     }
 };
