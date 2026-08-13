@@ -25,6 +25,12 @@ jobs:
           node-version: 20
           cache: npm
 
+      # Flips the repo's Pages source to GitHub Actions on the first run, so
+      # this does not need doing by hand in Settings.
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       - run: npm ci
 
       - run: npm run build
