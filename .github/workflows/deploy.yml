@@ -18,7 +18,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # avatar.glb is stored in Git LFS. Without this the checkout hands the
+      # build a 132-byte pointer file, which deploys and 3D silently breaks.
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - uses: actions/setup-node@v4
         with:
