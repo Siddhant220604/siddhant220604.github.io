@@ -13,16 +13,11 @@ import CallToAction from "./CallToAction";
 import setSplitText from "./utils/splitText";
 
 const MainContainer = ({ children }: PropsWithChildren) => {
-  const [isDesktopView, setIsDesktopView] = useState<boolean>(
-    window.innerWidth > 1024
-  );
-  const [isMobile] = useState<boolean>(window.innerWidth <= 768);
   const [shouldRenderCharacter, setShouldRenderCharacter] = useState(false);
 
   useEffect(() => {
     const resizeHandler = () => {
       setSplitText();
-      setIsDesktopView(window.innerWidth > 1024);
     };
     resizeHandler();
     window.addEventListener("resize", resizeHandler);
@@ -32,7 +27,9 @@ const MainContainer = ({ children }: PropsWithChildren) => {
   }, []);
 
   useEffect(() => {
-    if (window.innerWidth <= 1024) return;
+    // Previously bailed out below 1025px. That left the character unmounted,
+    // and because the loading counter lives inside its scene, anything between
+    // 769 and 1024px sat on "0%" forever with no way past the loading screen.
 
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
     let idleId: number | undefined;
@@ -64,7 +61,7 @@ const MainContainer = ({ children }: PropsWithChildren) => {
       <Cursor />
       <Navbar />
       <SocialIcons />
-      {isDesktopView && !isMobile && shouldRenderCharacter && children}
+      {shouldRenderCharacter && children}
       <div className="container-main">
         <Landing />
         <About />

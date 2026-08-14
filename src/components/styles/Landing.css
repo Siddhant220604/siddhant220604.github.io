@@ -3,10 +3,16 @@
   display: none;
 }
 
-/* Remove mobile photo and ensure 3D character is always hidden on mobile */
+/* The template hid the 3D on phones and showed a photo instead. The model
+   is wanted on mobile too, so it stays and the photo goes. */
 @media only screen and (max-width: 768px) {
   .character-model {
-    display: none !important;
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 52vh !important;
+    order: 2;
+    z-index: 1;
   }
 
   .landing-section,
@@ -123,9 +129,9 @@
     display: none;
   }
 
-  /* Show mobile photo */
+  /* Superseded by the 3D character above. */
   .mobile-photo {
-    display: block;
+    display: none;
     position: relative !important;
     width: 100%;
     max-width: 380px;
@@ -452,8 +458,14 @@ h2.landing-info-h2 {
 }
 
 @media screen and (min-width: 768px) {
+  /* 769-1024px was the one range the template never rendered the character
+     in, so its 80vh box left the model framed out of view. Same fixed,
+     full-height treatment as desktop. */
   .character-model {
-    height: 80vh;
+    height: 100vh;
+    bottom: 0;
+    z-index: 11;
+    position: fixed;
   }
 
   .landing-intro h2 {

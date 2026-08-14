@@ -11,6 +11,7 @@ import {
   handleTouchMove,
 } from "./utils/mouseUtils";
 import setAnimations from "./utils/animationUtils";
+import { applyFraming, BASE_FOV } from "./utils/framing";
 import { setProgress } from "../Loading";
 
 const Scene = () => {
@@ -38,11 +39,10 @@ const Scene = () => {
       renderer.toneMappingExposure = 1;
       canvasDiv.current.appendChild(renderer.domElement);
 
-      const camera = new THREE.PerspectiveCamera(14.5, aspect, 0.1, 1000);
-      camera.position.z = 10;
+      const camera = new THREE.PerspectiveCamera(BASE_FOV, aspect, 0.1, 1000);
       camera.position.set(0, 13.1, 24.7);
       camera.zoom = 1.1;
-      camera.updateProjectionMatrix();
+      applyFraming(camera);
 
       let headBone: THREE.Object3D | null = null;
       let screenLight: any | null = null;
